@@ -482,8 +482,8 @@ class HPI
             else if(!i) throw std::invalid_argument("Empty string");
 
             data.clear();
+            data.reserve((i + 9) / 9 + 2);
             data.push_back(0);
-            data.reserve(i + 2);
             len = 0;
 
             ULL start = 0;
@@ -838,21 +838,27 @@ class HPI
          * @brief Convert the HPI objects to an arbitrary numeral system std::string.
          * 将 HPI 对象转换为一个任意进制的 std::string
          * @param base Specify the base, default is 10. 指定进制，默认为 10
+         * @param cupperCase If true, base letters greater than 10 are capitalized; if false (default), they are lowercase.
+         * 如果为 true，则大于 10 的进制字母为大写，如果为 false（默认），则为小写
          * @return The extracted value as a std::string. If the HPI is negative, The first character will be a negative sign.
          * 返回一个 std::string，如果 HPI 是负数，那么第一个字符将会是负号
          * @throw std::invalid_argument if base < 2 or base > 36.
          * 如果 base < 2 或者 base > 36 将会抛出 std::invalid_argument 错误
         */
-        std::string toBaseStr(int base = 10) const
+        std::string toBaseStr(int base = 10, bool cupperCase = false) const
         {
             if(base < 2 || base > 36) throw std::invalid_argument("Base must be between 2 and 36");
             if(!len) return "0";
 
             std::string res;
-            res.reserve(len * 3);
+            if(base <= 2) res.reserve(len * 3);
+            else if(base <= 7) res.reserve(len * 2);
+            else res.reserve(len);
             HPI tmp = *this;
             tmp.data[0] = 0;
-            const char digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const char* digits = cupperCase
+                                  ? "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                  : "0123456789abcdefghijklmnopqrstuvwxyz";
             int* HPI_RESTRICT tmp_data = tmp.data.data();
             
             while(tmp)
@@ -941,7 +947,7 @@ class HPI
                 std::snprintf(buf, sizeof(buf), "%09d", data[edLimbIdx]);
                 res.append(buf + (8 - edOff), 1 + edOff);
 
-                for (ULL i = edLimbIdx - 1; i > stLimbIdx; i--) 
+                for(ULL i = edLimbIdx - 1; i > stLimbIdx; i--) 
                 {
                     std::snprintf(buf, sizeof(buf), "%09d", data[i]);
                     res.append(buf, 9);
