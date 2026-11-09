@@ -13,7 +13,7 @@ Development history (only the most prominent updates are listed):
 - v2.0: Fully switched to base 10^9 arithmetic, optimized memory allocation and release, and reduced the time to about 10 seconds.
 - v3.0: Introduced `__restrict` to remove pointer aliasing restrictions, implemented raw pointer optimization, eliminated redundant branches in core loops, and reduced the time to about 2 seconds.
 - v4.0: Implemented Karatsuba multiplication and Knuth Algorithm D division. Applied zero-copy slicing and fast exponentiation with modular reduction at each step; the final 2^900000 computation time stabilized at about 0.35 seconds.
-- v4.1: Added a large number of utility functions covering cryptography and number theory, and added bilingual (Doxygen) comments for all functions.
+- v4.1 (current version): Added a large number of utility functions covering cryptography and number theory, and added bilingual (Doxygen) comments for all functions.
 
 ## (II) Software Architecture
 
