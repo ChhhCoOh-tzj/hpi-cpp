@@ -1,9 +1,11 @@
+**Translated by DeepSeek in English**
+
 # HPI-cpp
 
 ## (I) Introduction
 
 **HPI (High-precision integer library)**
-Modern lightweight C++17 high-performance arbitrary-precision integer arithmetic library
+Modern lightweight cross-platform C++17 high-performance arbitrary-precision integer arithmetic library
 
 This is a purely self-taught and self-developed **lightweight**, **high-precision**, **high-performance**, and memory-saving C++ big integer library. The project is completely self-taught and original; it is an independent development completed by me, **a 14-year-old junior high school student**, in about one month through four generations of updates.
 You can even use it as a native C++ data type, because it overloads almost all operators, supports direct input/output with cin and cout, has sufficiently natural construction, and also comes with a large number of practical utility functions!
@@ -20,6 +22,7 @@ Development history (only the most prominent updates are listed):
 The underlying layer uses base 10^9 (`BASE = 1000000000`), with data stored in `std::vector<int>`. `data[0]` is the sign bit (0 positive, 1 negative), and the significant value starts from `data[1]`.
 In core operation functions, `__restrict` raw pointers and local-variable register caching are frequently used, removing frequent memory reads/writes when handling carries in inner loops.
 Doxygen comments have also been added to some operator overloads with complex mechanisms and to all utility functions.
+All identifiers use camel hump abbreviated naming convention.
 
 **Generic Functions**
 - Because generic functions are used, an HPI can not only operate with another HPI object; as long as the right-hand side of all operators is an HPI object, an HPI object can operate with native C++ data types and return a new rvalue (depending on whether it is a compound assignment operator) HPI object.
@@ -45,6 +48,7 @@ Doxygen comments have also been added to some operator overloads with complex me
 **I/O Design**
 - Input/construction/assignment are based on strings, and theoretically infinitely long data can be input.
 - Output uses `std::setw()` and `std::setfill()` to pad zeros, so as to maintain correctness in decimal form.
+**Note: std:: printf() formatted printing and std:: scanf() formatted input are not supported!! **
 
 **Utility Functions**
 - Comes with a large number of practical utility functions, covering advanced mathematics, number theory, cryptography, arbitrary base conversion, and slice functions, using high-performance algorithms (such as Newton iteration, extended Euclidean algorithm, etc.), and has been deeply optimized.
@@ -94,7 +98,7 @@ By overloading the input stream `std::istream` and output stream `std::ostream` 
 1. Convert to `long long` form: object `.toLL()`, function signature: `long long toLL() const`, obtains the lowest 18 decimal digits of the HPI object and converts them to `long long` type and returns it, for operations with native C++ data types or other purposes; higher digits will be automatically truncated.
 2. Convert to `std::string` form in arbitrary base: object `.toBaseStr()`, function signature: `std::string toBaseStr(int base = 10) const`, converts the HPI object to `std::string` type in arbitrary base and returns it, for use by other libraries or GUI display; the user can specify the target base, with range 2 <= base <= 36.
 3. Get the number of digits of the HPI object in decimal form: object `.getDigits()`, function signature: `ULL getDigits() const`
-4. HPI object integer slice: object `. cutHPI(starting position, truncation length, whether to start from the lower bits) `, function signature: ` HPI cutHPI(ULL pos, ULL size, bool startFromLowDigit = false) const`， The index starts from 0, please refer to the Doxygen code comment for details.
+4. HPI object integer slice: object `. cutHPI(starting position, truncation length, whether to start from the lower bits) `, function signature: ` HPI cutHPI(ULL pos, ULL size, bool startFromLowDigit = false) const`， The index starts from 0, please refer to the Doxygen comment for details.
 5. Get absolute value: object `.abs()`, function signature: `HPI abs() const`, returns the absolute value.
 6. Exponentiation: object `.pow(exponent)`, function signature: `HPI pow(long long exp)`, performs exponentiation based on the fast exponentiation algorithm.
 7. Exponentiation with modulo: object `.pow(exponent, modulus)`, function signature: `HPI pow(long long exp, const HPI& mod)`, performs exponentiation + modulo based on the fast exponentiation algorithm.
@@ -104,6 +108,7 @@ By overloading the input stream `std::istream` and output stream `std::ostream` 
 11. Modular inverse: object `.modInv(modulus)`, function signature: `HPI modInv(const HPI& mod) const`, based on the extended Euclidean algorithm.
 12. Check even: object `.isEven()`, function signature: `bool isEven() const`, to prevent users from calling `a % 2 == 0` and causing a full division to run again.
 13. Check odd: object `.isOdd()`, function signature: `bool isOdd() const`, to prevent users from calling `a % 2 == 1` and causing a full division to run again.
+For details, please refer to the Doxygen comments.
 
 ## (V) Performance Tests
 

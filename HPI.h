@@ -838,25 +838,47 @@ class HPI
          * @brief Convert the HPI objects to an arbitrary numeral system std::string.
          * 将 HPI 对象转换为一个任意进制的 std::string
          * @param base Specify the base, default is 10. 指定进制，默认为 10
-         * @param cupperCase If true, base letters greater than 10 are capitalized; if false (default), they are lowercase.
+         * @param upperCase If true, base letters greater than 10 are capitalized; if false (default), they are lowercase.
          * 如果为 true，则大于 10 的进制字母为大写，如果为 false（默认），则为小写
          * @return The extracted value as a std::string. If the HPI is negative, The first character will be a negative sign.
          * 返回一个 std::string，如果 HPI 是负数，那么第一个字符将会是负号
          * @throw std::invalid_argument if base < 2 or base > 36.
          * 如果 base < 2 或者 base > 36 将会抛出 std::invalid_argument 错误
         */
-        std::string toBaseStr(int base = 10, bool cupperCase = false) const
+        std::string toBaseStr(int base = 10, bool upperCase = false) const
         {
             if(base < 2 || base > 36) throw std::invalid_argument("Base must be between 2 and 36");
             if(!len) return "0";
 
+            static const int maxCharLen[] = {
+                0, 0, 
+                3322, 2096, 1661, 1431, 1282, 1184, 1109, 1048,
+                1000, 959, 924, 892, 865, 840, 818, 797, 778, 761,
+                746, 731, 718, 705, 694, 683, 672, 662, 653, 645,
+                637, 629, 621, 614, 607, 600, 594, 588
+            };
+
             std::string res;
-            if(base <= 2) res.reserve(len * 3);
-            else if(base <= 7) res.reserve(len * 2);
-            else res.reserve(len);
+            res.reserve(getDigits() * maxCharLen[base] / 1000 + 2);
+
+            if(base == 10)
+            {
+                char buf[16];
+                if(data[0]) res.push_back('-');
+                
+                int n = std::snprintf(buf, sizeof(buf), "%d", data[len]);
+                res.append(buf, n);
+                for (ULL i = len - 1; i >= 1; i--) {
+                    int n = std::snprintf(buf, sizeof(buf), "%09d", data[i]);
+                    res.append(buf, n);
+                }
+
+                return res;
+            }
+
             HPI tmp = *this;
             tmp.data[0] = 0;
-            const char* digits = cupperCase
+            const char* digits = upperCase
                                   ? "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                   : "0123456789abcdefghijklmnopqrstuvwxyz";
             int* HPI_RESTRICT tmp_data = tmp.data.data();
@@ -865,7 +887,7 @@ class HPI
             {
                 int rem_val = 0;
 
-                for(int i = tmp.len; i >= 1; i--)
+                for(ULL i = tmp.len; i >= 1; i--)
                 {
                     ULL cur = (ULL)rem_val * BASE + tmp_data[i];
                     tmp_data[i] = cur / base;
@@ -909,9 +931,11 @@ class HPI
          * 切片的起始位置，索引从 0 开始
          * @param size The length of the segment to extract. 
          * 要提取的切片长度
-         * @param startFromLowDigit If true, 'pos' counts from the lowest digit. 
-         * If false (default), 'pos' counts from the highest digit. 
-         * 如果为 true，则从最低位起算 pos，如果为 false（默认），则从最高位起算 pos
+         * @param startFromLowDigit If true, 'pos' counts from the lowest digit and slice towards higher positions. 
+         * If false (default), 'pos' counts from the highest digit and slice towards lower positions. 
+         * But no matter what, The order of the returned numbers is always high on the left and low on the right.
+         * 如果为 true，则从最低位起算 pos 并且向高位切片，如果为 false（默认），则从最高位起算 pos 并且向低位切片，
+         * 但无论如何返回的数字顺序始终为左边是高位右边是低位
          * @return A new HPI object representing the extracted digits.
          * 返回一个包含截取数字的新 HPI 对象
          * @throws std::out_of_range If 'pos' is out of range or 'pos + size' exceeds the total number of digits.
@@ -934,7 +958,7 @@ class HPI
             ULL edOff = ed % 9;
 
             std::string res;
-            res.reserve(size);
+            res.reserve(size + 2);
             char buf[16];
 
             if(stLimbIdx == edLimbIdx)

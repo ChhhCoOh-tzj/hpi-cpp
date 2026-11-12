@@ -3,7 +3,7 @@
 ## （一）介绍
 
 **HPI (High-precision integer library)**
-现代轻量化 C++17 高性能任意精度整数算术库
+现代轻量级跨平台 C++17 高性能任意精度整数算术库
 
 这是一个纯自学自研的  **轻量化** 、 **高精度** 、 **高性能**  且 省内存 的 C++ 大整数库。项目完全自学原创，是我 **一名 14 岁的初中生** 耗时大约一个月，经过四代更新独立开发完成的。
 你甚至可以把它当作一个 C++ 原生数据类型来使用，因其重载了几乎所有的运算符，支持 cin、cout 直接输入输出，足够自然的构造，并且还自带了大量实用工具函数！
@@ -20,6 +20,7 @@
 底层采用 10^9 进制（`BASE = 1000000000`），数据存储在 `std::vector<int>` 中。`data[0]` 为符号位（0 正 1 负），有效数值从 `data[1]` 开始。
 运算核心函数中频繁利用 `__restrict` 裸指针和局部变量寄存器缓存，去除了内层循环中处理进位时的频繁内存读写。
 在有部分复杂机制运算符重载与所有工具函数中还添加了 Doxygen 注释。
+标识符全部采用驼峰缩写命名法。
 
 **泛型函数**
 - 因为采用了泛型函数，一个 HPI 不止可以与另一个 HPI 对象运算，只要确保所有运算符的右边是 HPI 对象，HPI 对象可以与 C++ 原生数据类型运算并返回一个新的右值（取决于是不是运算赋值符） HPI 对象。
@@ -89,12 +90,13 @@ HPI 重载了几乎所有的运算符，下面列举出所有支持的运算符�
 
 ### （3）I/O 流重载
 通过重载 `<iostream>` 中的输入流 `std::istream` 和输出流 `std::ostream`，HPI 对象能够完全像 C++ 原生类型（如 `int`、`double`）一样，直接使用 `std::cin` 和 `std::cout` 或标准输入输出流进行输入输出。你可以直接使用 `cin >>` 读入大整数，使用 `cout <<` 打印大整数。输入时，HPI 会自动处理前导零、正负号，并验证数据的合法性，并且支持连锁调用。
+**注意：不支持 std::printf() 格式化打印与 std::scanf() 格式化输入！！**
 
 ### （4）工具函数
 1. 转换为 `long long` 形式：对象 `.toLL()`，函数签名：`long long toLL() const`， 获取 HPI 对象的最低18位十进制数字并转换成 `long long` 类型并返回 ，用于与 C++ 原生数据类型运算或其他用途，较高的数位将被自动截断。
 2. 转换为任意进制的 `std::string` 形式：对象 `.toBaseStr(进制，大小写)`，函数签名：`std::string toBaseStr(int base = 10, bool cupperCase = false) const`， 将 HPI 对象转换为任意进制的 `std::string` 类型并返回 ，用于其他库使用或 GUI 显示，用户可以指定目标进制，也可指定超过 10 的进制字母的大小写，范围 2 <= base <= 36。
 3. 获取 HPI 对象在十进制形式下的位数：对象 `.getDigits()`，函数签名：`ULL getDigits() const`
-4. HPI 对象整数切片：对象 `.cutHPI(起始位置, 截取长度, 是否从低位开始)`，函数签名：`HPI cutHPI(ULL pos, ULL size, bool startFromLowDigit = false) const`，索引从 0 开始，详见代码 Doxygen 注释。
+4. HPI 对象整数切片：对象 `.cutHPI(起始位置, 截取长度, 是否从低位开始)`，函数签名：`HPI cutHPI(ULL pos, ULL size, bool startFromLowDigit = false) const`，索引从 0 开始，详见 Doxygen 注释。
 5. 取绝对值：对象 `.abs()`，函数签名：`HPI abs() const`，返回绝对值。
 6. 幂运算：对象 `.pow(指数)`，函数签名：`HPI pow(long long exp)`，基于快速幂算法进行幂运算。
 7. 带取模的幂运算：对象 `.pow(指数, 模数)`，函数签名：`HPI pow(long long exp, const HPI& mod)`，基于快速幂算法进行幂运算+取模。
@@ -104,6 +106,7 @@ HPI 重载了几乎所有的运算符，下面列举出所有支持的运算符�
 11. 模幂逆元：对象 `.modInv(模数)`，函数签名：`HPI modInv(const HPI& mod) const`，基于扩展欧几里得算法。
 12. 判断偶数：对象 `.isEven()`，函数签名：`bool isEven() const`，为了防止用户调用 `a % 2 == 0` 导致还要跑一遍完整的除法。
 13. 判断奇数：对象 `.isOdd()`，函数签名：`bool isOdd() const`，为了防止用户调用 `a % 2 == 1` 导致还要跑一遍完整的除法。
+详情可见 Doxygen 注释
 
 ## （五）性能测试
 
