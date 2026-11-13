@@ -578,28 +578,28 @@ class HPI
         HPI operator-(const HPI& other) const { return HPIadd(other, true); }
         /**
          * @brief High performance multiplication, 
-         * automatically enable Karatsuba algorithm when both multiplier digits are higher than 1024 bits, 
+         * automatically enable Karatsuba algorithm when both multiplier digits are higher than THRESHOLD * 9 digits, 
          * And it uses bare pointer optimization, time complexity is O(n^1.585).
-         * 高性能乘法，当两个乘数位数都高于 1024 位时，将自动启用 Karatsuba 算法，并且它使用了裸指针优化，时间复杂度为 O(n^1.585)
+         * 高性能乘法，当两个乘数位数都高于 THRESHOLD * 9 位时，将自动启用 Karatsuba 算法，并且它使用了裸指针优化，时间复杂度为 O(n^1.585)
         */
         HPI operator*(const HPI& other) const { return HPImul(other); }
         /**
          * @brief High performance division,
-         * when dividing by low-precision data, there is special processing, 
-         * and the time complexity is O(n). When dividing by high-precision data, 
+         * when dividing by low-precision data (less than ten digits), there is special processing, 
+         * and the time complexity is O(n). When dividing by high-precision data (greater than or equal ten digits), 
          * Knuth's Algorithm D division is automatically used, nd it will enable naked pointer optimization, 
          * the time complexity is O(n * m).
-         * 高性能除法，当除以低精度数据时会有特化处理，时间复杂度为 O(n)，当除以高精度数据时，将自动启用 Knuth's Algorithm D 除法，
+         * 高性能除法，当除以低精度数据（<10位）时会有特化处理，时间复杂度为 O(n)，当除以高精度数据（>=10位）时，将自动启用 Knuth's Algorithm D 除法，
          * 并且会启用裸指针优化，时间复杂度为 O(n * m)
         */
         HPI operator/(const HPI& other) const { return HPIdiv(other); }
         /**
          * @brief High performance modular exponentiation,
-         * when modulo a low-precision data with another data, there is special processing, 
-         * and the time complexity is O(n). When dmodulo a high-precision data with another data, 
+         * when the modulus is low precision data (less than ten digits), there is special processing, 
+         * and the time complexity is O(n). When the modulus is high precision data (greater than or equal ten digits), 
          * Knuth's Algorithm D division is automatically used, and it uses bare pointer optimization, 
-         * the time complexity is O(n * m)
-         * 高性能模运算，当对低精度数据进行取模时会有特化处理，时间复杂度为 O(n)，当对高精度数据进行取模时，会自动调用 Knuth 算法 D 进行除法，
+         * the time complexity is O(n * m).
+         * 高性能模运算，当模数是低精度数据（<10位）时会有特化处理，时间复杂度为 O(n)，当模数是高精度数据（>=10位）时，会自动调用 Knuth 算法 D 进行除法，
          * 并且会启用裸指针优化，时间复杂度为 O(n * m)
          * @note The positive and negative of the modular exponentiation result depends on the modular number.
          * 取模结果的正负性取决于被取模数
@@ -635,9 +635,9 @@ class HPI
 
         /**
          * @brief High performance multiplication, 
-         * automatically enable Karatsuba algorithm when both multiplier digits are higher than 1024 bits, 
+         * automatically enable Karatsuba algorithm when both multiplier digits are higher than THRESHOLD * 9 digits, 
          * And it uses bare pointer optimization, time complexity is O(n^1.585).
-         * 高性能乘法，当两个乘数位数都高于 1024 位时，将自动启用 Karatsuba 算法，并且它使用了裸指针优化，时间复杂度为 O(n^1.585)
+         * 高性能乘法，当两个乘数位数都高于 THRESHOLD * 9 位时，将自动启用 Karatsuba 算法，并且它使用了裸指针优化，时间复杂度为 O(n^1.585)
         */
         template <typename T>
         HPI operator*(const T& in) const
@@ -649,11 +649,11 @@ class HPI
 
         /**
          * @brief High performance division,
-         * when dividing by low-precision data, there is special processing, 
-         * and the time complexity is O(n). When dividing by high-precision data, 
+         * when dividing by low-precision data (less than ten digits), there is special processing, 
+         * and the time complexity is O(n). When dividing by high-precision data (greater than or equal ten digits), 
          * Knuth's Algorithm D division is automatically used, nd it will enable naked pointer optimization, 
          * the time complexity is O(n * m).
-         * 高性能除法，当除以低精度数据时会有特化处理，时间复杂度为 O(n)，当除以高精度数据时，将自动启用 Knuth's Algorithm D 除法，
+         * 高性能除法，当除以低精度数据（<10位）时会有特化处理，时间复杂度为 O(n)，当除以高精度数据（>=10位）时，将自动启用 Knuth's Algorithm D 除法，
          * 并且会启用裸指针优化，时间复杂度为 O(n * m)
         */
         template <typename T>
@@ -666,11 +666,11 @@ class HPI
 
         /**
          * @brief High performance modular exponentiation,
-         * when modulo a low-precision data with another data, there is special processing, 
-         * and the time complexity is O(n). When dmodulo a high-precision data with another data, 
+         * when the modulus is low precision data (less than ten digits), there is special processing, 
+         * and the time complexity is O(n). When the modulus is high precision data (greater than or equal ten digits), 
          * Knuth's Algorithm D division is automatically used, and it uses bare pointer optimization, 
-         * the time complexity is O(n * m)
-         * 高性能模运算，当对低精度数据进行取模时会有特化处理，时间复杂度为 O(n)，当对高精度数据进行取模时，会自动调用 Knuth 算法 D 进行除法，
+         * the time complexity is O(n * m).
+         * 高性能模运算，当模数是低精度数据（<10位）时会有特化处理，时间复杂度为 O(n)，当模数是高精度数据（>=10位）时，会自动调用 Knuth 算法 D 进行除法，
          * 并且会启用裸指针优化，时间复杂度为 O(n * m)
          * @note The positive and negative of the modular exponentiation result depends on the modular number.
          * 取模结果的正负性取决于被取模数

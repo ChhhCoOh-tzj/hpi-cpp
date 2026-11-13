@@ -79,6 +79,18 @@ HPI overloads almost all operators; all supported operators are listed below:
 - `++` (prefix), `++` (postfix), `--` (prefix), `--` (postfix)
 - `>`, `<`, `>=`, `<=`, `==`, `!=`
 
+### Multiplication Performance Configuration Guide
+
+You can customize the `THRESHOLD` constant (located inside `HPI.h`). This constant represents the starting threshold for the Karatsuba algorithm, measured in limbs.
+
+Simply put, **when the decimal digit counts of both multipliers are greater than `THRESHOLD * 9`** (since 1 limb stores 9 decimal digits), the library will automatically switch from basic schoolbook multiplication to the advanced Karatsuba algorithm.
+
+Generally, the optimal threshold varies by device configuration and depends primarily on the **CPU's L1/L2 cache size** and the **compiler's optimization level**. A larger cache and a higher optimization level (e.g., enabling `-O3`) result in a higher optimal threshold; conversely, it should be lower.
+
+**If you don't want to deal with complex tuning, here is a quick guide:**
+- **If your device was manufactured in 2020 or later**: Keep the default threshold of `128`, which is the empirically optimal threshold.
+- **If your device was manufactured before 2020**: It is recommended to lower the threshold to `64` to avoid performance degradation caused by smaller caches on older devices.
+
 An HPI can fully operate with another HPI object, can use these operators freely like native C++ data types, and can also support chained operator calls like native C++ data types.
 Moreover, as long as the right-hand side of all operators is an HPI object, HPI objects can also operate with native C++ data types and will return a new rvalue (depending on whether it is a compound assignment operator) HPI object.
 
