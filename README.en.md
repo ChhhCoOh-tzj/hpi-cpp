@@ -79,6 +79,15 @@ HPI overloads almost all operators; all supported operators are listed below:
 - `++` (prefix), `++` (postfix), `--` (prefix), `--` (postfix)
 - `>`, `<`, `>=`, `<=`, `==`, `!=`
 
+**Example:**
+
+```
+    HPI a = 10;
+    HPI b = 30;
+    a += b;
+    a = b * 5;
+```
+
 ### Multiplication Performance Configuration Guide
 
 You can customize the `THRESHOLD` constant (located inside `HPI.h`). This constant represents the starting threshold for the Karatsuba algorithm, measured in limbs.
@@ -93,15 +102,6 @@ Generally, the optimal threshold varies by device configuration and depends prim
 
 An HPI can fully operate with another HPI object, can use these operators freely like native C++ data types, and can also support chained operator calls like native C++ data types.
 Moreover, as long as the right-hand side of all operators is an HPI object, HPI objects can also operate with native C++ data types and will return a new rvalue (depending on whether it is a compound assignment operator) HPI object.
-
-Example:
-
-```
-    HPI a = 10;
-    HPI b = 30;
-    a += b;
-    a = b * 5;
-```
 
 ### (3) I/O Stream Overloading
 By overloading the input stream `std::istream` and output stream `std::ostream` in `<iostream>`, HPI objects can behave completely like native C++ types (such as `int`, `double`), directly using `std::cin` and `std::cout` or standard input/output streams for I/O. You can directly use `cin >>` to read a big integer and `cout <<` to print a big integer. During input, HPI automatically handles leading zeros, signs, and validates the legality of the data, and supports chained calls.
