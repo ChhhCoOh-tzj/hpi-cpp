@@ -1061,7 +1061,7 @@ class HPI
          * 如果对负数开平方将会抛出 std::domain_error 错误
         */
         HPI isqrt() const
-       {
+        {
             if(data[0]) throw std::domain_error("Calculate square root of a negative number");
             if(!len) return HPI();
 

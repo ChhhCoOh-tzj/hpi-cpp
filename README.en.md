@@ -24,6 +24,11 @@ In core operation functions, `__restrict` raw pointers and local-variable regist
 Doxygen comments have also been added to some operator overloads with complex mechanisms and to all utility functions.
 All identifiers use camel hump abbreviated naming convention.
 
+**Move Semantics & Zero-Copy**
+- Strictly follows the C++11 "Rule of Five", explicitly declaring the default move constructor and move assignment operator (`= default` with `noexcept`).
+- In expressions like `HPI c = a + b;`, the compiler automatically triggers move semantics (or constructs in-place via RVO). This completely avoids the O(n) deep copies that occur in traditional big integer libraries due to temporary objects created by overloaded operators.
+- Specifically implemented an rvalue reference overload for the unary minus operator `operator-() &&`. When negating a temporary object, it flips the sign bit directly on the original object, achieving true zero-copy.
+
 **Generic Functions**
 - Because generic functions are used, an HPI can not only operate with another HPI object; as long as the right-hand side of all operators is an HPI object, an HPI object can operate with native C++ data types and return a new rvalue (depending on whether it is a compound assignment operator) HPI object.
 
