@@ -7,19 +7,19 @@
 **HPI (High-precision integer library)**
 Modern lightweight cross-platform C++17 high-performance arbitrary-precision integer arithmetic library
 
-This is a purely self-taught and self-developed **lightweight**, **high-precision**, **high-performance**, and memory-saving C++ big integer library. The project is completely self-taught and original; it is an independent development completed by me, **a 14-year-old junior high school student**, in about one month through four generations of updates.
+This is a purely self-taught and self-developed **lightweight**, **high-precision**, **high-performance**, and **efficient utilization of memory** C++ big integer library. The project is completely self-taught and original; it is an independent development completed by me, **a 14-year-old junior high school student**, in about one month through four generations of updates.
 You can even use it as a native C++ data type, because it overloads almost all operators, supports direct input/output with cin and cout, has sufficiently natural construction, and also comes with a large number of practical utility functions!
 
 Development history (only the most prominent updates are listed):
 - v1.0: The initial version, pure long multiplication and basic dynamic memory allocation. Operations were extremely slow (computing 2^900000 took about 15 seconds), and long division had a deadlock issue. (At that time it could only be considered a toy program.)
 - v2.0: Fully switched to base 10^9 arithmetic, optimized memory allocation and release, and reduced the time to about 10 seconds.
 - v3.0: Introduced `__restrict` to remove pointer aliasing restrictions, implemented raw pointer optimization, eliminated redundant branches in core loops, and reduced the time to about 2 seconds.
-- v4.0: Implemented Karatsuba multiplication and Knuth Algorithm D division. Applied zero-copy slicing and fast exponentiation with modular reduction at each step; the final 2^900000 computation time stabilized at about 0.35 seconds.
+- v4.0: Implemented Karatsuba multiplication and Knuth Algorithm D division. Applied zero-copy slicing and fast exponentiation with modular reduction at each step; the final 2^900000 computation time stabilized at about 0.17 seconds.
 - v4.1 (current version): Added a large number of utility functions covering cryptography and number theory, fix some bugs, and added bilingual (Doxygen) comments for all functions.
 
 ## (II) Software Architecture
 
-The underlying layer uses base 10^9 (`BASE = 1000000000`), with data stored in `std::vector<int>`. `data[0]` is the sign bit (0 positive, 1 negative), and the significant value starts from `data[1]`.
+The underlying layer uses base 10^9 (`BASE = 1000000000`), a limb = 9 digits decimal number, with data stored in `std::vector<int>`. `data[0]` is the sign bit (0 positive, 1 negative), and the significant value starts from `data[1]`.
 In core operation functions, `__restrict` raw pointers and local-variable register caching are frequently used, removing frequent memory reads/writes when handling carries in inner loops.
 Doxygen comments have also been added to some operator overloads with complex mechanisms and to all utility functions.
 All identifiers use camel hump abbreviated naming convention.
@@ -33,7 +33,7 @@ All identifiers use camel hump abbreviated naming convention.
 - Because generic functions are used, an HPI can not only operate with another HPI object; as long as the right-hand side of all operators is an HPI object, an HPI object can operate with native C++ data types and return a new rvalue (depending on whether it is a compound assignment operator) HPI object.
 
 **Multiplication Design (Karatsuba and Long Multiplication)**
-- Automatic algorithm selection: set 128 limbs as the threshold. Below the threshold, use long multiplication; above it, automatically enable the Karatsuba algorithm.
+- According to the threshold set by the user (or the default threshold, see the multiplication performance configuration guide below), if it is below the threshold, vertical multiplication will be performed. If it is above the threshold, the Karatsuba algorithm will be automatically enabled.
 - Zero-copy slicing: in Karatsuba recursion, no deep copy of arrays is performed; index ranges are passed directly through pointers.
 - Low-level optimization: uses `__restrict` raw pointers and local-variable register caching to remove frequent memory reads/writes when handling carries in inner loops.
 
@@ -51,7 +51,7 @@ All identifiers use camel hump abbreviated naming convention.
 - In Karatsuba recursion, no deep copy of arrays is performed; index ranges are passed directly through pointers.
 
 **I/O Design**
-- Input/construction/assignment are based on strings, and theoretically infinitely long data can be input.
+- Input/construction/assignment are based on std::string, and theoretically infinitely long data can be input.
 - Output uses `std::setw()` and `std::setfill()` to pad zeros, so as to maintain correctness in decimal form.
 **Note: std:: printf() formatted printing and std:: scanf() formatted input are not supported!! **
 
@@ -128,7 +128,7 @@ By overloading the input stream `std::istream` and output stream `std::ostream` 
 
 **For detailed usage of utility functions, please refer to the Doxygen comments**
 
-## (V) Performance Tests
+## (V) Arithmetic performance Tests
 
 **Test Platform**
 - Computer: ASUS ZenBook 14 (2020 thin-and-light laptop)
@@ -136,6 +136,7 @@ By overloading the input stream `std::istream` and output stream `std::ostream` 
 - Memory: 16 GB
 - Operating System: Windows 11 Enterprise 21H2
 - Environment state: kept plugged in, performance mode enabled, background processes closed, maintained at a relatively low temperature.
+- Testing tool: using the `<chrono>` C++standard library.
 - Compilation parameters: `-O3 -march=native -std=c++17`
 - The test results below all take the minimum value from multiple runs.
 
@@ -155,8 +156,8 @@ By overloading the input stream `std::istream` and output stream `std::ostream` 
 - `2^23333333`: time 34.7989968s (result **7,024,034** digits)
 
 **Division and Modulo Tests (random 1000 digits divided by random 500 digits)**
-- Division: single-run time approx. 0.0000258s ~ 0.0000376s
-- Modulo: single-run time approx. 0.0000259s ~ 0.0000376s
+- Division: single-run time approx. 0.0000258s
+- Modulo: single-run time approx. 0.0000259s
 
 **Exponentiation Modulo Tests**
 - `2^900000 % 1000000007`: time 0.0000538s
