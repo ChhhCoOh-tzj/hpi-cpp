@@ -497,7 +497,7 @@ class HPI
                 ULL val = 0;
                 for (ULL k = j; k < i; k++) 
                 {
-                    if(s[k] < 48 || s[k] > 57) throw std::invalid_argument("Input contains non-digit characters");
+                    if(s[k] < 48 || s[k] > 57) throw std::invalid_argument("The string used to construct HPI contains non-digit characters");
                     val = val * 10 + (s[k] - '0');
                 }
 
